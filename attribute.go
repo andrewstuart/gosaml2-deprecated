@@ -3,7 +3,6 @@ package saml
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"io"
 )
 
@@ -35,7 +34,6 @@ func (a *Attributes) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 			}
 		case xml.CharData:
 			if len(bytes.TrimSpace(t)) > 0 {
-				fmt.Printf("t = %s\n", t)
 				(*a)[n] = string(bytes.TrimSpace(t))
 			}
 		}
