@@ -1,88 +1,24 @@
 package saml
 
 import (
-	"crypto"
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/sha1"
 	"crypto/tls"
-	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"log"
-	"regexp"
 )
 
-var pk crypto.PrivateKey
-var cert tls.Certificate
+//RelyingParty can decrypt saml
+// type RelyingParty struct {
+// 	cert tls.Certificate
+// }
 
-func init() {
-	var err error
-	pfx := "../openid-sp-enc"
-	cert, err = tls.LoadX509KeyPair(fmt.Sprintf("%s.crt", pfx), fmt.Sprintf("%s.key", pfx))
-	if err != nil {
-		log.Fatal(err)
-	}
-	pk = cert.PrivateKey
-}
-
-//EncryptedKey contains the decryption key data from the saml2 core and xmlenc
-//standards.
-type EncryptedKey struct {
-	// EncryptionMethod string `xml:"EncryptionMethod>Algorithm"`
-	X509Data    string `xml:"KeyInfo>X509Data>X509Certificate"`
-	CipherValue string `xml:"CipherData>CipherValue"`
-}
-
-func xmlBytes(str string) ([]byte, error) {
-	if len(str) == 0 {
-		return nil, fmt.Errorf("No string to decode")
-	}
-
-	re := regexp.MustCompile("[ \t]")
-	str = re.ReplaceAllString(str, "")
-
-	if str[0] == '\n' {
-		str = str[1:]
-	}
-
-	return base64.StdEncoding.DecodeString(str)
-}
-
-//SymmetricKey returns the private key contained in the EncryptedKey document
-func (ek *EncryptedKey) SymmetricKey() (cipher.Block, error) {
-	cipherText, err := xmlBytes(ek.CipherValue)
-	if err != nil {
-		return nil, err
-	}
-
-	var digest []byte
-	//TODO use mask function if needed here
-	// if digest != "" {
-	// 	db, err = xmlBytes(digest)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("Digest error %v", err)
-	// 	}
-	// }
-
-	switch pk := pk.(type) {
-	case *rsa.PrivateKey:
-		pt, err := rsa.DecryptOAEP(sha1.New(), rand.Reader, pk, cipherText, digest)
-		if err != nil {
-			return nil, fmt.Errorf("rsa internal error: %v", err)
-		}
-
-		b, err := aes.NewCipher(pt)
-		if err != nil {
-			return nil, err
-		}
-
-		return b, nil
-	}
-	return nil, fmt.Errorf("no cipher for decoding symmetric key")
-}
+//NewRelyingParty allows a user to decrypt using a passed certificate
+// func NewRelyingParty(cert tls.Certificate) (*RelyingParty, error) {
+// 	rp := RelyingParty{cert}
+// 	return &rp, nil
+// }
 
 //Response is an abstraction type for handling the information in a SAML
 //assertion
@@ -96,8 +32,8 @@ type Response struct {
 }
 
 //Decrypt returns the byte slice contained in the encrypted data.
-func (sr *Response) Decrypt() ([]byte, error) {
-	k, err := sr.Key.SymmetricKey()
+func (sr *Response) Decrypt(cert tls.Certificate) ([]byte, error) {
+	k, err := sr.Key.SymmetricKey(cert)
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot decrypt, error retrieving private key: %v", err)
@@ -114,9 +50,14 @@ func (sr *Response) Decrypt() ([]byte, error) {
 	c := cipher.NewCBCDecrypter(k, data[:aes.BlockSize])
 
 	//Decrypt blocks
-	c.CryptBlocks(plainText, data)
+	c.CryptBlocks(plainText, data[aes.BlockSize:])
 
-	//Remove padding (each padding byte is a uint8 equal to the length of the padding)
+	//Remove zero block if needed
+	plainText = bytes.TrimRight(plainText, string([]byte{0}))
+
+	//Calculate index tot remove based on padding
 	padLength := plainText[len(plainText)-1]
-	return plainText[:len(plainText)-int(padLength)], nil
+	lastGoodIndex := len(plainText) - int(padLength)
+
+	return plainText[:lastGoodIndex], nil
 }

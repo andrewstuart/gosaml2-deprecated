@@ -2,11 +2,27 @@ package saml
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/tls"
 	"encoding/xml"
+	"fmt"
 	"log"
 	"os"
 	"testing"
 )
+
+var cert tls.Certificate
+var pk crypto.PrivateKey
+
+func init() {
+	var err error
+	pfx := "../openid-sp-enc"
+	cert, err = tls.LoadX509KeyPair(fmt.Sprintf("%s.crt", pfx), fmt.Sprintf("%s.key", pfx))
+	if err != nil {
+		log.Fatal(err)
+	}
+	pk = cert.PrivateKey
+}
 
 func TestDecode(t *testing.T) {
 	f, err := os.Open("./testdata/saml.xml")
@@ -21,7 +37,7 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("error decoding test saml: %v", err)
 	}
 
-	k, err := r.Key.SymmetricKey()
+	k, err := r.Key.SymmetricKey(cert)
 	if err != nil {
 		t.Fatalf("could not get symmetric key: %v\n", err)
 	}
@@ -30,7 +46,7 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("no symmetric key")
 	}
 
-	bs, err := r.Decrypt()
+	bs, err := r.Decrypt(cert)
 	if err != nil {
 		t.Fatalf("error decrypting saml data: %v\n", err)
 	}
@@ -40,6 +56,4 @@ func TestDecode(t *testing.T) {
 	if len(bs) == 0 {
 		t.Fatalf("decrypt returned no bytes")
 	}
-
-	log.Println(string(bs[16:]))
 }
