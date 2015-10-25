@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/xml"
 	"fmt"
 )
@@ -29,19 +30,21 @@ type Response struct {
 	Value       string       `xml:",attr"`
 	Key         EncryptedKey `xml:"EncryptedAssertion>EncryptedData>KeyInfo>EncryptedKey"`
 	Data        string       `xml:"EncryptedAssertion>EncryptedData>CipherData>CipherValue"`
+	Signature   string       `xml:"Signature>SignatureValue"`
 }
 
 //Decrypt returns the byte slice contained in the encrypted data.
 func (sr *Response) Decrypt(cert tls.Certificate) ([]byte, error) {
+
+	data, err := xmlBytes(sr.Data)
+	if err != nil {
+		return nil, err
+	}
+
 	k, err := sr.Key.SymmetricKey(cert)
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot decrypt, error retrieving private key: %v", err)
-	}
-
-	data, err := xmlBytes(sr.Data)
-	if err != nil {
-		return nil, fmt.Errorf("base64 error: %v\n", err)
 	}
 
 	plainText := make([]byte, len(data))
@@ -60,4 +63,25 @@ func (sr *Response) Decrypt(cert tls.Certificate) ([]byte, error) {
 	lastGoodIndex := len(plainText) - int(padLength)
 
 	return plainText[:lastGoodIndex], nil
+}
+
+func (sr *Response) validateSignature(cPool []tls.Certificate) error {
+	bs, err := xmlBytes(sr.Signature)
+	if err != nil {
+		return err
+	}
+
+	data, err := xmlBytes(sr.Data)
+	if err != nil {
+		return err
+	}
+
+	for _, cert := range cPool {
+		err := cert.Leaf.CheckSignature(x509.SHA384WithRSA, data, bs)
+		if err == nil {
+			return nil
+		}
+	}
+
+	return ErrNoTrustedIDP
 }

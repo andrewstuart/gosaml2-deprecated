@@ -56,4 +56,11 @@ func TestDecode(t *testing.T) {
 	if len(bs) == 0 {
 		t.Fatalf("decrypt returned no bytes")
 	}
+
+	err = r.validateSignature(testContext.IDPCerts)
+
+	if err != nil {
+		t.Errorf("signature verification failur: %v", err)
+	}
+
 }

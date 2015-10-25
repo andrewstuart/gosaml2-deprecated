@@ -14,6 +14,7 @@ var (
 	ErrTooSoon          = fmt.Errorf("assertion not valid yet")
 	ErrTooLate          = fmt.Errorf("assertion no longer valid")
 	ErrAudienceMismatch = fmt.Errorf("audience mismatch")
+	ErrNoTrustedIDP     = fmt.Errorf("failed to find a trusted idp certificate")
 )
 
 //Assertion is a type to deserialize SAML assertions
