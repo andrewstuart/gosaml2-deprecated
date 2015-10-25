@@ -1,6 +1,7 @@
 package saml
 
 import (
+	"crypto/tls"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -29,6 +30,8 @@ type Assertion struct {
 //Validate takes a Context and returns an error. Nil return means a successful
 //validation
 func (a *Assertion) Validate(c Context) error {
+	//TODO validate signature
+
 	//Check the assertion condition time range
 	n := time.Now()
 	if n.Before(a.Conditions.NotBefore) {
@@ -102,6 +105,7 @@ func (cs *Conditions) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 //Conditions
 type Context struct {
 	Audience string
+	IDPCerts []tls.Certificate
 }
 
 //The Condition interface validates a context based on the condition's internal

@@ -22,6 +22,7 @@ func TestAssertion(t *testing.T) {
 	if len(a.Conditions.List) < 1 {
 		t.Fatalf("conditions not unmashalled. length is %d, should be at least 1", len(a.Conditions.List))
 	}
+
 	if a.Conditions.List[0].Validate(Context{Audience: "oauth.astuart.co"}) != nil {
 		t.Errorf("did not validate audience")
 	}
