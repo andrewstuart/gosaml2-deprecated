@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/tls"
-	"encoding/xml"
 	"fmt"
 	"log"
 	"os"
@@ -31,8 +30,7 @@ func TestDecode(t *testing.T) {
 	}
 	defer f.Close()
 
-	var r Response
-	err = xml.NewDecoder(f).Decode(&r)
+	r, err := NewResponseFromReader(f)
 	if err != nil {
 		t.Fatalf("error decoding test saml: %v", err)
 	}
@@ -57,10 +55,12 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("decrypt returned no bytes")
 	}
 
+	log.Println(string(r.Signed))
+
 	err = r.validateSignature(testContext.IDPCerts)
 
 	if err != nil {
-		t.Errorf("signature verification failur: %v", err)
+		t.Errorf("signature verification failure: %v", err)
 	}
 
 }
