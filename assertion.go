@@ -38,7 +38,7 @@ func (a *Assertion) Validate(c Context) error {
 	if n.Before(a.Conditions.NotBefore) {
 		return ErrTooSoon
 	}
-	if n.Equal(a.Conditions.ToNotOnOrAfter) || n.After(a.Conditions.ToNotOnOrAfter) {
+	if n.Equal(a.Conditions.NotOnOrAfter) || n.After(a.Conditions.NotOnOrAfter) {
 		return ErrTooLate
 	}
 
@@ -56,9 +56,9 @@ func (a *Assertion) Validate(c Context) error {
 
 //Conditions holds a list of the contingencies of a SAMl assertion
 type Conditions struct {
-	NotBefore      time.Time `xml:"NotBefore,attr"`
-	ToNotOnOrAfter time.Time `xml:"NotOnOrAfter,attr"`
-	List           []Condition
+	NotBefore    time.Time `xml:"NotBefore,attr"`
+	NotOnOrAfter time.Time `xml:"NotOnOrAfter,attr"`
+	List         []Condition
 }
 
 //UnmarshalXML implements the Unmarshaler interface
@@ -69,7 +69,7 @@ func (cs *Conditions) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 		case "NotBefore":
 			cs.NotBefore, err = time.Parse(time.RFC3339, attr.Value)
 		case "NotOnOrAfter":
-			cs.ToNotOnOrAfter, err = time.Parse(time.RFC3339, attr.Value)
+			cs.NotOnOrAfter, err = time.Parse(time.RFC3339, attr.Value)
 		}
 		if err != nil {
 			return err
