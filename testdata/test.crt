@@ -1,0 +1,98 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 18 (0x12)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=US, ST=Arizona, L=Phoenix, O=Andrew Stuart Home, CN=Andrew Stuart Home CA/name=Andrew Stuart CA/emailAddress=andrew.stuart2@gmail.com
+        Validity
+            Not Before: Oct 24 16:55:31 2015 GMT
+            Not After : Oct 21 16:55:31 2025 GMT
+        Subject: C=US, ST=Arizona, L=Phoenix, O=Andrew Stuart Home, CN=openid-sp-enc/name=OpenVPN/emailAddress=andrew.stuart2@gmail.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:9b:ef:5c:51:79:de:5f:01:f6:67:38:f4:d7:c8:
+                    24:86:04:e9:1d:e2:5c:d8:38:d5:39:3f:40:59:1b:
+                    f8:c1:2e:7b:b9:3e:2f:d7:8f:46:75:b2:ec:99:37:
+                    6a:01:bc:f3:68:35:41:8f:24:d5:4f:5a:d8:68:0f:
+                    7e:c6:ed:90:e5:8a:f8:4d:bd:99:df:08:2a:fe:99:
+                    25:e1:10:43:f0:32:36:be:22:70:bc:9c:46:21:cf:
+                    0b:fc:27:ae:86:51:9d:8d:6f:22:0b:e9:22:c1:fa:
+                    87:21:2c:4b:00:6d:bc:95:35:18:28:4d:a9:c3:4e:
+                    d4:c9:95:7b:06:84:51:47:16:6f:19:c4:6a:7e:ad:
+                    89:c2:f3:06:dd:5a:f3:05:1e:a3:0f:dd:5a:d1:0f:
+                    45:85:f6:24:4f:27:12:59:5b:e6:5f:ed:c1:d6:ef:
+                    51:dc:ba:64:f0:61:3a:18:51:9f:b3:f7:8b:72:f6:
+                    f8:ee:20:52:df:7d:89:31:b5:83:79:41:67:a8:d7:
+                    79:00:9f:7f:82:7e:a2:04:d6:09:0c:ba:c0:5b:47:
+                    97:78:6f:cd:e6:83:97:d2:6a:43:48:59:2f:5a:f4:
+                    83:20:49:48:a2:36:9b:17:11:b5:14:66:c6:58:68:
+                    fc:2e:1a:0d:e2:e6:93:e9:15:05:36:d1:26:c4:27:
+                    86:ab
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            Netscape Comment: 
+                Easy-RSA Generated Server Certificate
+            X509v3 Subject Key Identifier: 
+                BD:FF:33:58:4D:F4:E3:00:F4:96:14:E7:37:8F:44:82:C7:63:31:D5
+            X509v3 Authority Key Identifier: 
+                keyid:DB:F2:59:9D:FF:C4:17:4B:6D:EB:BE:BF:0F:2B:94:09:25:00:F7:98
+                DirName:/C=US/ST=Arizona/L=Phoenix/O=Andrew Stuart Home/CN=Andrew Stuart Home CA/name=Andrew Stuart CA/emailAddress=andrew.stuart2@gmail.com
+                serial:AF:15:4E:20:24:2F:77:CE
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha256WithRSAEncryption
+         9a:6a:83:dc:ea:0c:e9:45:5e:8e:22:9f:59:74:a6:f5:5d:4f:
+         c6:3b:67:a9:2c:25:b8:8e:15:d1:35:11:83:1b:be:de:a0:0e:
+         93:28:cc:40:02:15:31:62:d2:c0:7b:c8:13:43:b0:13:f2:23:
+         1c:c0:af:d5:d8:28:7b:e9:55:81:2c:d0:00:a0:18:fc:ba:b4:
+         eb:8a:79:af:ea:aa:04:3d:08:4b:64:43:72:2a:20:18:8b:dd:
+         e8:a8:8e:9d:e5:6b:f9:e9:b8:62:dd:fb:eb:50:e8:d6:b7:d5:
+         97:c6:7a:22:40:31:1d:f0:f6:53:23:20:c1:ce:00:20:20:1b:
+         fd:81:e9:91:0f:e8:cd:3e:e2:ad:d7:26:7f:c1:6c:46:74:d8:
+         03:fd:dd:7b:4d:7c:57:e1:1b:28:81:6b:5f:ff:a1:87:e4:0c:
+         3b:9e:97:37:72:c3:64:74:8e:ae:61:b7:29:35:5d:5a:e6:73:
+         1b:59:d7:c9:0e:33:28:09:0b:ae:13:2d:07:e2:0f:70:ee:a5:
+         27:8d:cb:41:d5:b6:1f:05:33:4d:56:61:8b:98:29:55:77:25:
+         5a:29:ec:ca:64:0e:9a:42:6f:05:e6:ce:bb:69:61:11:a8:22:
+         7f:cd:07:be:e4:cc:2d:54:79:f0:0e:82:de:1c:51:69:37:91:
+         30:c0:b1:b8
+-----BEGIN CERTIFICATE-----
+MIIFVTCCBD2gAwIBAgIBEjANBgkqhkiG9w0BAQsFADCBsjELMAkGA1UEBhMCVVMx
+EDAOBgNVBAgTB0FyaXpvbmExEDAOBgNVBAcTB1Bob2VuaXgxGzAZBgNVBAoTEkFu
+ZHJldyBTdHVhcnQgSG9tZTEeMBwGA1UEAxMVQW5kcmV3IFN0dWFydCBIb21lIENB
+MRkwFwYDVQQpExBBbmRyZXcgU3R1YXJ0IENBMScwJQYJKoZIhvcNAQkBFhhhbmRy
+ZXcuc3R1YXJ0MkBnbWFpbC5jb20wHhcNMTUxMDI0MTY1NTMxWhcNMjUxMDIxMTY1
+NTMxWjCBoTELMAkGA1UEBhMCVVMxEDAOBgNVBAgTB0FyaXpvbmExEDAOBgNVBAcT
+B1Bob2VuaXgxGzAZBgNVBAoTEkFuZHJldyBTdHVhcnQgSG9tZTEWMBQGA1UEAxMN
+b3BlbmlkLXNwLWVuYzEQMA4GA1UEKRMHT3BlblZQTjEnMCUGCSqGSIb3DQEJARYY
+YW5kcmV3LnN0dWFydDJAZ21haWwuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+MIIBCgKCAQEAm+9cUXneXwH2Zzj018gkhgTpHeJc2DjVOT9AWRv4wS57uT4v149G
+dbLsmTdqAbzzaDVBjyTVT1rYaA9+xu2Q5Yr4Tb2Z3wgq/pkl4RBD8DI2viJwvJxG
+Ic8L/CeuhlGdjW8iC+kiwfqHISxLAG28lTUYKE2pw07UyZV7BoRRRxZvGcRqfq2J
+wvMG3VrzBR6jD91a0Q9FhfYkTycSWVvmX+3B1u9R3Lpk8GE6GFGfs/eLcvb47iBS
+332JMbWDeUFnqNd5AJ9/gn6iBNYJDLrAW0eXeG/N5oOX0mpDSFkvWvSDIElIojab
+FxG1FGbGWGj8LhoN4uaT6RUFNtEmxCeGqwIDAQABo4IBgzCCAX8wCQYDVR0TBAIw
+ADARBglghkgBhvhCAQEEBAMCBkAwNAYJYIZIAYb4QgENBCcWJUVhc3ktUlNBIEdl
+bmVyYXRlZCBTZXJ2ZXIgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFL3/M1hN9OMA9JYU
+5zePRILHYzHVMIHnBgNVHSMEgd8wgdyAFNvyWZ3/xBdLbeu+vw8rlAklAPeYoYG4
+pIG1MIGyMQswCQYDVQQGEwJVUzEQMA4GA1UECBMHQXJpem9uYTEQMA4GA1UEBxMH
+UGhvZW5peDEbMBkGA1UEChMSQW5kcmV3IFN0dWFydCBIb21lMR4wHAYDVQQDExVB
+bmRyZXcgU3R1YXJ0IEhvbWUgQ0ExGTAXBgNVBCkTEEFuZHJldyBTdHVhcnQgQ0Ex
+JzAlBgkqhkiG9w0BCQEWGGFuZHJldy5zdHVhcnQyQGdtYWlsLmNvbYIJAK8VTiAk
+L3fOMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDANBgkqhkiG9w0B
+AQsFAAOCAQEAmmqD3OoM6UVejiKfWXSm9V1PxjtnqSwluI4V0TURgxu+3qAOkyjM
+QAIVMWLSwHvIE0OwE/IjHMCv1dgoe+lVgSzQAKAY/Lq064p5r+qqBD0IS2RDciog
+GIvd6KiOneVr+em4Yt3761Do1rfVl8Z6IkAxHfD2UyMgwc4AICAb/YHpkQ/ozT7i
+rdcmf8FsRnTYA/3de018V+EbKIFrX/+hh+QMO56XN3LDZHSOrmG3KTVdWuZzG1nX
+yQ4zKAkLrhMtB+IPcO6lJ43LQdW2HwUzTVZhi5gpVXclWinsymQOmkJvBebOu2lh
+Eagif80HvuTMLVR58A6C3hxRaTeRMMCxuA==
+-----END CERTIFICATE-----

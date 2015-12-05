@@ -17,7 +17,7 @@ var pk crypto.PrivateKey
 
 func init() {
 	var err error
-	pfx := "../openid-sp-enc"
+	pfx := "./testdata/test-enc"
 	cert, err = tls.LoadX509KeyPair(fmt.Sprintf("%s.crt", pfx), fmt.Sprintf("%s.key", pfx))
 	if err != nil {
 		log.Fatal(err)
