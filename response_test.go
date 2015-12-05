@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/tls"
+	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -30,7 +32,8 @@ func TestDecode(t *testing.T) {
 	}
 	defer f.Close()
 
-	r, err := NewResponseFromReader(f)
+	var r Response
+	err = xml.NewDecoder(f).Decode(&r)
 	if err != nil {
 		t.Fatalf("error decoding test saml: %v", err)
 	}
@@ -55,7 +58,12 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("decrypt returned no bytes")
 	}
 
-	log.Println(string(r.Signed))
+	bs, err = ioutil.ReadFile("./testdata/saml.xml")
+	if err != nil {
+		t.Fatalf("load: %v\n", err)
+	}
+
+	r.Raw = bs
 
 	err = r.validateSignature(testContext.IDPCerts)
 

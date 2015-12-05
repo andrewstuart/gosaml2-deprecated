@@ -6,10 +6,10 @@ import (
 	"crypto/cipher"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/xml"
 	"fmt"
-	"io"
-	"regexp"
+	"log"
+
+	"github.com/lestrrat/go-libxml2"
 )
 
 //Response is an abstraction type for handling the information in a SAML
@@ -22,32 +22,9 @@ type Response struct {
 	Data        string       `xml:"EncryptedAssertion>EncryptedData>CipherData>CipherValue"`
 	Signature   string       `xml:"Signature>SignatureValue"`
 	Digest      string       `xml:"Signature>SignedInfo>Reference>DigestValue"`
-	Signed      []byte
+	Raw         []byte       //       `xml:",innerxml"`
 	//TODO xml.Unmarshaler to automatically decrypt assertion?
 	// Assertion   Assertion    `xml:"EncryptedAssertion>EncryptedData>CipherData>CipherValue"`
-}
-
-//TODO replace NewResponseFromReader with a custom UnmrashalXML?
-
-//NewResponseFromReader returns a Response or error based on the given reader.
-func NewResponseFromReader(r io.Reader) (*Response, error) {
-	buf := &bytes.Buffer{}
-
-	var res Response
-
-	//Decode and copy bytes into buffer
-	err := xml.NewDecoder(io.TeeReader(r, buf)).Decode(&res)
-	if err != nil {
-		return nil, err
-	}
-
-	//RE to remove enveloped signature
-	re := regexp.MustCompile("(?sm)ds:Signature.*</ds:Signature>.*?<")
-
-	//Copy raw bytes into response for use in verifying signature
-	res.Signed = re.ReplaceAll(buf.Bytes(), nil)
-
-	return &res, nil
 }
 
 //Decrypt returns the byte slice contained in the encrypted data.
@@ -83,16 +60,30 @@ func (sr *Response) Decrypt(cert tls.Certificate) ([]byte, error) {
 }
 
 func (sr *Response) validateSignature(trusted []tls.Certificate) error {
-	sig, err := xmlBytes(sr.Signature)
+	sig, err := xmlBytes(sr.Digest)
+	if err != nil {
+		return err
+	}
+
+	// re := regexp.MustCompile("(?sm)ds:Signature.*</ds:Signature>.*?<")
+
+	p := &libxml2.Parser{}
+	doc, err := p.Parse(bytes.NewBuffer(sr.Raw))
+	if err != nil {
+		return err
+	}
+
+	canon, err := doc.ToStringC14N(true)
 	if err != nil {
 		return err
 	}
 
 	for _, cert := range trusted {
-		err = cert.Leaf.CheckSignature(x509.SHA256WithRSA, sr.Signed, sig)
+		err = cert.Leaf.CheckSignature(x509.SHA256WithRSA, []byte(canon), sig)
 		if err == nil {
 			return nil
 		}
+		log.Println(err)
 	}
 
 	return ErrNoTrustedIDP
