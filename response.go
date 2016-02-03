@@ -5,12 +5,17 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/tls"
-	"crypto/x509"
 	"fmt"
-	"log"
 
 	"github.com/lestrrat/go-libxml2"
+	"github.com/lestrrat/go-xmlsec"
+	"github.com/lestrrat/go-xmlsec/crypto"
+	"github.com/lestrrat/go-xmlsec/dsig"
 )
+
+const xtx = `count(ancestor-or-self::dsig:Signature |
+   here()/ancestor::dsig:Signature[1]) >
+   count(ancestor-or-self::dsig:Signature)`
 
 //Response is an abstraction type for handling the information in a SAML
 //assertion
@@ -21,10 +26,9 @@ type Response struct {
 	Key         EncryptedKey `xml:"EncryptedAssertion>EncryptedData>KeyInfo>EncryptedKey"`
 	Data        string       `xml:"EncryptedAssertion>EncryptedData>CipherData>CipherValue"`
 	Signature   string       `xml:"Signature>SignatureValue"`
+	SigningCert string       `xml:"Signature>KeyInfor>X509Data>X509Certificate"`
 	Digest      string       `xml:"Signature>SignedInfo>Reference>DigestValue"`
-	Raw         []byte       //       `xml:",innerxml"`
-	//TODO xml.Unmarshaler to automatically decrypt assertion?
-	// Assertion   Assertion    `xml:"EncryptedAssertion>EncryptedData>CipherData>CipherValue"`
+	Raw         []byte
 }
 
 //Decrypt returns the byte slice contained in the encrypted data.
@@ -60,31 +64,45 @@ func (sr *Response) Decrypt(cert tls.Certificate) ([]byte, error) {
 }
 
 func (sr *Response) validateSignature(trusted []tls.Certificate) error {
-	sig, err := xmlBytes(sr.Digest)
-	if err != nil {
-		return err
-	}
+	// sig, err := xmlBytes(sr.Digest)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// re := regexp.MustCompile("(?sm)ds:Signature.*</ds:Signature>.*?<")
 
-	p := &libxml2.Parser{}
-	doc, err := p.Parse(bytes.NewBuffer(sr.Raw))
+	xmlsec.Init()
+	defer xmlsec.Shutdown()
+
+	doc, err := libxml2.Parse(sr.Raw)
+	if err != nil {
+		return err
+	}
+	defer doc.Free()
+
+	km, err := crypto.NewKeyManager()
+	if err != nil {
+		return err
+	}
+	defer km.Free()
+
+	bs, err := xmlBytes(sr.SigningCert)
 	if err != nil {
 		return err
 	}
 
-	canon, err := doc.ToStringC14N(true)
+	err = km.LoadCert(bs, crypto.KeyDataFormatCertPem, crypto.KeyDataType(crypto.KeyDataTypePublic))
 	if err != nil {
 		return err
 	}
 
-	for _, cert := range trusted {
-		err = cert.Leaf.CheckSignature(x509.SHA256WithRSA, []byte(canon), sig)
-		if err == nil {
-			return nil
-		}
-		log.Println(err)
+	ctx, err := dsig.NewCtx(km)
+	if err != nil {
+		return err
 	}
+	defer ctx.Free()
+
+	ctx.Verify(doc)
 
 	return ErrNoTrustedIDP
 }
