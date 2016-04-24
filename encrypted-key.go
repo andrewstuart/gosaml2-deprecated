@@ -52,6 +52,10 @@ func (ek *EncryptedKey) SymmetricKey(cert tls.Certificate) (cipher.Block, error)
 		return nil, fmt.Errorf("error getting certificate from encryptedkey: %v", err)
 	}
 
+	if len(cert.Certificate) < 1 {
+		return nil, fmt.Errorf("decryption tls.Certificate has no public certs attached")
+	}
+
 	if !bytes.Equal(cert.Certificate[0], encCert) {
 		return nil, fmt.Errorf("key decryption attempted with mismatched cert")
 	}
