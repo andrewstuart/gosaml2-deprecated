@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"os"
 	"testing"
 )
 
@@ -15,7 +16,7 @@ var pk crypto.PrivateKey
 
 func init() {
 	var err error
-	pfx := "../openid-sp-enc"
+	pfx := "./testdata/test"
 	cert, err = tls.LoadX509KeyPair(fmt.Sprintf("%s.crt", pfx), fmt.Sprintf("%s.key", pfx))
 	if err != nil {
 		log.Fatal(err)
@@ -24,13 +25,15 @@ func init() {
 }
 
 func TestDecode(t *testing.T) {
-	f, err := os.Open("./testdata/saml.xml")
+	f, err := ioutil.ReadFile("./testdata/saml.post")
 	if err != nil {
 		t.Fatalf("could not open test file: %v\n", err)
 	}
-	defer f.Close()
+	decoded := make([]byte, len(f))
 
-	r, err := NewResponseFromReader(f)
+	base64.StdEncoding.Decode(decoded, f)
+
+	r, err := NewResponseFromReader(bytes.NewReader(decoded))
 	if err != nil {
 		t.Fatalf("error decoding test saml: %v", err)
 	}
@@ -49,18 +52,12 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("error decrypting saml data: %v\n", err)
 	}
 
-	bs = bytes.TrimSpace(bs)
-
-	if len(bs) == 0 {
-		t.Fatalf("decrypt returned no bytes")
-	}
-
-	log.Println(string(r.Signed))
-
-	err = r.validateSignature(testContext.IDPCerts)
-
+	f2, err := ioutil.ReadFile("./testdata/saml.xml")
 	if err != nil {
-		t.Errorf("signature verification failure: %v", err)
+		t.Fatalf("could not read expected output")
 	}
 
+	if !bytes.Equal(f2, bs) {
+		t.Errorf("decrypted assertion did not match expectation")
+	}
 }

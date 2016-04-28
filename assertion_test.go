@@ -17,7 +17,7 @@ var testContext = Context{
 }
 
 func init() {
-	bs, err := ioutil.ReadFile("../idp-signing.crt")
+	bs, err := ioutil.ReadFile("./testdata/idp.crt")
 	if err != nil {
 		log.Fatal("bad signing cert", err)
 	}
