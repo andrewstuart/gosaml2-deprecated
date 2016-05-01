@@ -5,7 +5,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -80,20 +79,4 @@ func (sr *Response) Decrypt(cert tls.Certificate) ([]byte, error) {
 	lastGoodIndex := len(plainText) - int(padLength)
 
 	return plainText[:lastGoodIndex], nil
-}
-
-func (sr *Response) validateSignature(trusted []tls.Certificate) error {
-	sig, err := xmlBytes(sr.Signature)
-	if err != nil {
-		return err
-	}
-
-	for _, cert := range trusted {
-		err = cert.Leaf.CheckSignature(x509.SHA256WithRSA, sr.Signed, sig)
-		if err == nil {
-			return nil
-		}
-	}
-
-	return ErrNoTrustedIDP
 }
